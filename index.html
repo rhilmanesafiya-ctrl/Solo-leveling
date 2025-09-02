@@ -971,7 +971,9 @@
     <audio id="notification-sound" preload="auto">
         <source src="notification-sound.mp3" type="audio/mpeg">
     </audio>
-    
+    <audio id="click-sound" preload="auto">
+        <source src="click-sound.mp3" type="audio/mpeg">
+    </audio>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // DOM Elements
@@ -998,6 +1000,7 @@
             const completeSound = document.getElementById('complete-sound');
             const achievementSound = document.getElementById('achievement-sound');
             const notificationSound = document.getElementById('notification-sound');
+            const clickSound = document.getElementById('click-sound');
             
             // Tab functionality
             const tabBtns = document.querySelectorAll('.tab-btn');
@@ -1430,6 +1433,9 @@
                 if (habit.dailyProgress >= habit.dailyGoal) {
                     return; // Already completed today
                 }
+                
+                // AJOUTEZ CETTE LIGNE POUR JOUER LE SON
+                clickSound.play();
                 
                 habit.dailyProgress++;
                 habit.current++;
