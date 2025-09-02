@@ -917,13 +917,15 @@
     <div class="level-up-notification" id="level-up-notification">
         <div class="level-up-text">LEVEL UP!</div>
     </div>
-    
+    <div class="level-up-notification" id="all-habits-complete-notification">
+        <div class="level-up-text">LEVEL UP!<br>All checked!</div>
+    </div>
     <div class="welcome-notification" id="welcome-notification">
         <div class="welcome-text">WELCOME TO THE SYSTEM</div>
     </div>
     
     <div class="daily-complete-notification" id="daily-complete-notification">
-        <div class="daily-complete-text">Daily Goal Complete! +<span id="points-earned">0</span> Points</div>
+        <div class="daily-complete-text"> Goal Complete! +<span id="points-earned">0</span> Points</div>
     </div>
     
     <div class="achievement-unlocked" id="achievement-unlocked">
@@ -955,6 +957,10 @@
         <source src="levelup-sound.mp3" type="audio/mpeg">
     </audio>
 
+    <audio id="all-complete-sound" preload="auto">
+        <source src="levelup-sound.mp3" type="audio/mpeg">
+    </audio>
+    
     <audio id="welcome-sound" preload="auto">
     <source src="welcome-sound.mp3" type="audio/mpeg">
     </audio>
@@ -1444,7 +1450,10 @@
                 if (habit.dailyProgress >= habit.dailyGoal) {
                     completeDailyGoal(habit);
                 }
-                
+                                // Vérifier si toutes les habitudes sont terminées aujourd'hui
+                if (checkAllHabitsCompleted()) {
+                    showAllHabitsCompleteNotification();
+                }
                 // Check if habit is fully completed
                 if (habit.current >= habit.target) {
                     completeHabit(index);
@@ -1930,7 +1939,25 @@
                     updateUI();
                 }
             }, 60000);
+                        // Vérifier si toutes les habitudes sont complétées aujourd'hui
+            function checkAllHabitsCompleted() {
+                if (state.habits.length === 0) return false;
+                
+                return state.habits.every(habit => habit.dailyProgress >= habit.dailyGoal);
+            }
             
+            // Afficher la notification de toutes les habitudes complétées
+            function showAllHabitsCompleteNotification() {
+                const notification = document.getElementById('all-habits-complete-notification');
+                const sound = document.getElementById('all-complete-sound');
+                
+                notification.style.display = 'block';
+                sound.play();
+                
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
             // Initialize UI
             updateUI();
         });
