@@ -1041,21 +1041,22 @@
             setTimeout(() => {
                 welcomeNotification.style.display = 'block';
                 
-                // Force reload the audio to ensure it plays every time
-                welcomeSound.currentTime = 0;
-                welcomeSound.play().catch(error => {
-                    console.log('Audio play failed:', error);
-                    // Try again after a short delay if it fails
-                    setTimeout(() => {
-                        welcomeSound.play();
-                    }, 500);
-                });
+                // Play welcome sound with user interaction workaround
+                const playWelcomeSound = () => {
+                    welcomeSound.play().catch(e => {
+                        console.log("Audio play failed:", e);
+                    });
+                    document.body.removeEventListener('click', playWelcomeSound);
+                };
+                
+                // Add click event listener to enable audio playback
+                document.body.addEventListener('click', playWelcomeSound);
                 
                 setTimeout(() => {
                     welcomeNotification.style.display = 'none';
                 }, 3000);
             }, 1000);
-
+            
             // Update UI regardless of whether state was loaded
             updateUI();
             // Save state to localStorage
