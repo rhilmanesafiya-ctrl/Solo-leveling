@@ -1559,6 +1559,15 @@
                         }
                     });
                 });
+                // Add sound to buy buttons
+                document.querySelectorAll('.use-item-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        // Play the click sound when any buy button is clicked
+                        clickSound.play().catch(e => {
+                            console.log("Audio play failed:", e);
+                        });
+                    });
+                });
             }
             
             // Render active items
