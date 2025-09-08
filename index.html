@@ -838,6 +838,62 @@
         overflow-x: auto;
     }
 }
+/* Animated background elements */
+.background-particle {
+    position: fixed;
+    background: rgba(0, 204, 255, 0.15);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    animation: float 15s infinite linear;
+}
+
+.background-particle:nth-child(odd) {
+    background: rgba(0, 102, 255, 0.1);
+    animation-duration: 20s;
+    animation-direction: reverse;
+}
+
+.background-particle:nth-child(3n) {
+    background: rgba(100, 150, 255, 0.2);
+    animation-duration: 25s;
+    animation-delay: -5s;
+}
+
+@keyframes float {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    100% {
+        transform: translate(100vw, 100vh) rotate(360deg);
+    }
+}
+
+/* Glowing orbs */
+.background-orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(40px);
+    opacity: 0.1;
+    z-index: -1;
+    animation: pulse-orb 8s infinite ease-in-out;
+}
+
+.background-orb:nth-child(2n) {
+    animation-delay: -2s;
+    animation-duration: 12s;
+}
+
+@keyframes pulse-orb {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.1;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.15;
+    }
+}
     </style>
 </head>
 <body>
@@ -2320,6 +2376,48 @@
             // Initialize UI
             updateUI();
         });
+                    // Create animated background elements
+            function createAnimatedBackground() {
+                const body = document.body;
+                
+                // Create floating particles
+                for (let i = 0; i < 15; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('background-particle');
+                    
+                    // Random size and position
+                    const size = Math.random() * 20 + 5;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${Math.random() * 100}vw`;
+                    particle.style.top = `${Math.random() * 100}vh`;
+                    particle.style.animationDelay = `${Math.random() * 5}s`;
+                    
+                    body.appendChild(particle);
+                }
+                
+                // Create glowing orbs
+                for (let i = 0; i < 4; i++) {
+                    const orb = document.createElement('div');
+                    orb.classList.add('background-orb');
+                    
+                    // Random size, position and color
+                    const size = Math.random() * 300 + 100;
+                    orb.style.width = `${size}px`;
+                    orb.style.height = `${size}px`;
+                    orb.style.left = `${Math.random() * 100}vw`;
+                    orb.style.top = `${Math.random() * 100}vh`;
+                    
+                    // Blue color variations
+                    const colors = ['#00ccff', '#0066ff', '#0044cc', '#003399'];
+                    orb.style.background = colors[i % colors.length];
+                    
+                    body.appendChild(orb);
+                }
+            }
+            
+            // Call the function to create the animated background
+            createAnimatedBackground();
     </script>
 </body>
 </html>
