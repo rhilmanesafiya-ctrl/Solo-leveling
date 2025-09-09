@@ -1809,7 +1809,7 @@
                 
                 // Update streak - This is the important line!
                 updateStreak();
-                
+                habit.consecutiveDays = (habit.consecutiveDays || 0) + 1;
                 // Show notification
                 document.getElementById('points-earned').textContent = pointsEarned;
                 dailyCompleteNotification.style.display = 'block';
