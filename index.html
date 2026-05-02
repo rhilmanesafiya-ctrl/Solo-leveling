@@ -718,6 +718,18 @@
             background: rgba(0, 204, 255, 0.2); /* Lighter background on hover */
             opacity: 1; /* Full opacity on hover */
         }
+        .habit-card {
+            cursor: grab;
+        }
+        .habit-card.dragging {
+            opacity: 0.4;
+            cursor: grabbing;
+            border: 2px dashed var(--neon-blue);
+        }
+        .habit-card.drag-over {
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 204, 255, 0.6);
+        }
         .combo-meter {
             height: 10px;
             background-color: rgba(0, 0, 0, 0.3);
@@ -727,31 +739,7 @@
             border: 1px solid var(--electric-blue);
             position: relative;
         }
-        .move-up-btn, .move-down-btn {
-            position: absolute;
-            background: transparent;
-            border: none;
-            color: #a0a0ff;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0.7;
-        }
-        
-        .move-up-btn { top: 60px; right: 10px; }
-        .move-down-btn { top: 85px; right: 10px; }
-        
-        .move-up-btn:hover, .move-down-btn:hover {
-            background: rgba(160, 160, 255, 0.2);
-            opacity: 1;
-        }
-        
-        
+          
         .combo-fill {
             height: 100%;
             background: linear-gradient(90deg, #ff9900, #ff5500);
@@ -1491,6 +1479,8 @@
                 state.habits.forEach((habit, index) => {
                     const habitCard = document.createElement('div');
                     habitCard.className = 'habit-card';
+                    habitCard.setAttribute('draggable', 'true');
+                    habitCard.setAttribute('data-index', index);
                     
                     const progressPercentage = (habit.current / habit.target) * 100;
                     const dailyProgressPercentage = (habit.dailyProgress / habit.dailyGoal) * 100;
@@ -1513,8 +1503,6 @@
                     habitCard.innerHTML = `
                         <button class="delete-habit-btn" data-index="${index}">✕</button>
                         <button class="edit-habit-btn" data-index="${index}">✎</button>
-                        <button class="move-up-btn" data-index="${index}">▲</button>
-                        <button class="move-down-btn" data-index="${index}">▼</button>
                         <div class="habit-title">
                             <span>${habit.name}</span>
                             <span class="habit-rank rank-${habit.rank}">${habit.rank.toUpperCase()}-Rank</span>
@@ -1555,6 +1543,37 @@
                     `;
                     
                     habitsContainer.appendChild(habitCard);
+                    // DRAG & DROP
+                    habitCard.addEventListener('dragstart', function() {
+                        this.classList.add('dragging');
+                        setTimeout(() => this.classList.add('dragging'), 0);
+                    });
+                    
+                    habitCard.addEventListener('dragend', function() {
+                        this.classList.remove('dragging');
+                        document.querySelectorAll('.habit-card').forEach(c => c.classList.remove('drag-over'));
+                    });
+                    
+                    habitCard.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        const dragging = document.querySelector('.habit-card.dragging');
+                        if (dragging && dragging !== this) {
+                            document.querySelectorAll('.habit-card').forEach(c => c.classList.remove('drag-over'));
+                            this.classList.add('drag-over');
+                        }
+                    });
+                    
+                    habitCard.addEventListener('drop', function(e) {
+                        e.preventDefault();
+                        const fromIndex = parseInt(document.querySelector('.habit-card.dragging').getAttribute('data-index'));
+                        const toIndex = parseInt(this.getAttribute('data-index'));
+                        if (fromIndex !== toIndex) {
+                            const moved = state.habits.splice(fromIndex, 1)[0];
+                            state.habits.splice(toIndex, 0, moved);
+                            saveState();
+                            updateUI();
+                        }
+                    });
                 });
                 
                 // Add event listeners to check buttons
@@ -1564,33 +1583,7 @@
                         incrementHabitProgress(index);
                     });
                 });
-                // Move up buttons
-                document.querySelectorAll('.move-up-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const index = parseInt(this.getAttribute('data-index'));
-                        if (index > 0) {
-                            const temp = state.habits[index];
-                            state.habits[index] = state.habits[index - 1];
-                            state.habits[index - 1] = temp;
-                            saveState();
-                            updateUI();
-                        }
-                    });
-                });
-                
-                // Move down buttons
-                document.querySelectorAll('.move-down-btn').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const index = parseInt(this.getAttribute('data-index'));
-                        if (index < state.habits.length - 1) {
-                            const temp = state.habits[index];
-                            state.habits[index] = state.habits[index + 1];
-                            state.habits[index + 1] = temp;
-                            saveState();
-                            updateUI();
-                        }
-                    });
-                });
+
                 // Add event listeners to delete buttons
                 document.querySelectorAll('.delete-habit-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
