@@ -727,6 +727,30 @@
             border: 1px solid var(--electric-blue);
             position: relative;
         }
+        .move-up-btn, .move-down-btn {
+            position: absolute;
+            background: transparent;
+            border: none;
+            color: #a0a0ff;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+        }
+        
+        .move-up-btn { top: 60px; right: 10px; }
+        .move-down-btn { top: 85px; right: 10px; }
+        
+        .move-up-btn:hover, .move-down-btn:hover {
+            background: rgba(160, 160, 255, 0.2);
+            opacity: 1;
+        }
+        
         
         .combo-fill {
             height: 100%;
@@ -1489,6 +1513,8 @@
                     habitCard.innerHTML = `
                         <button class="delete-habit-btn" data-index="${index}">✕</button>
                         <button class="edit-habit-btn" data-index="${index}">✎</button>
+                        <button class="move-up-btn" data-index="${index}">▲</button>
+                        <button class="move-down-btn" data-index="${index}">▼</button>
                         <div class="habit-title">
                             <span>${habit.name}</span>
                             <span class="habit-rank rank-${habit.rank}">${habit.rank.toUpperCase()}-Rank</span>
@@ -1538,7 +1564,33 @@
                         incrementHabitProgress(index);
                     });
                 });
+                // Move up buttons
+                document.querySelectorAll('.move-up-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        if (index > 0) {
+                            const temp = state.habits[index];
+                            state.habits[index] = state.habits[index - 1];
+                            state.habits[index - 1] = temp;
+                            saveState();
+                            updateUI();
+                        }
+                    });
+                });
                 
+                // Move down buttons
+                document.querySelectorAll('.move-down-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        if (index < state.habits.length - 1) {
+                            const temp = state.habits[index];
+                            state.habits[index] = state.habits[index + 1];
+                            state.habits[index + 1] = temp;
+                            saveState();
+                            updateUI();
+                        }
+                    });
+                });
                 // Add event listeners to delete buttons
                 document.querySelectorAll('.delete-habit-btn').forEach(btn => {
                     btn.addEventListener('click', function() {
